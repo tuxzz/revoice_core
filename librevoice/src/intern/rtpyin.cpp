@@ -43,7 +43,6 @@ RvRTPYinProcessorParameter *rvCreateRTPYinProcessorParameter(RvReal minFreq, RvR
     1.0,
     hopSize, std::max(static_cast<int>(roundUpToPowerOf2(sr / minFreq * 4.0)), hopSize),
     4, pdfSize,
-    hopSize,
     true, selfAllocPdf
   });
 }
@@ -69,7 +68,6 @@ RvRTPYinProcessor *rvCreateRTPYinProcessor(const RvRTPYinProcessorParameter *par
   rvAssert(param->bias > 0.0, "invalid bias");
   rvAssert(param->hopSize > 0 && param->maxWindowSize >= param->hopSize, "invalid hopSize or maxWindowSize");
   rvAssert(param->maxIter >= 1 && param->pdfSize > 0, "invalid maxIter or pdfSize");
-  rvAssert(param->maxInputSegment > 0, "invalid maxInputSegment");
 
   auto self = new RvRTPYinProcessor;
   self->param = *param;
@@ -84,15 +82,15 @@ RvRTPYinProcessor *rvCreateRTPYinProcessor(const RvRTPYinProcessorParameter *par
     if(filterOrder % 2 == 0)
       filterOrder += 1;
     auto kernel = RVALLOC(RvReal, filterOrder);
-    rvFirwinSingleBand(filterOrder, 0.0, std::max(1500.0, param->maxFreq * 4.0), "blackman", true, param->samprate / 2.0, kernel);
-    self->filterProc = rvCreateRTFilter(kernel, filterOrder, param->maxInputSegment);
+    rvFirwinSingleBand(filterOrder, 0.0, std::max(param->maxFreq + 500.0, param->maxFreq * 3.0), "blackman", true, param->samprate / 2.0, kernel);
+    self->filterProc = rvCreateRTFilter(kernel, filterOrder, param->hopSize);
     rvFree(kernel);
   }
   self->differenceWorker = rvCreateYinDifferenceWorker(param->maxWindowSize);
   self->internalDelayed = false;
   self->bufferUsed = self->param.maxWindowSize / 2;
 
-  self->bufferSize = param->maxWindowSize + std::max(param->maxInputSegment, rvRTFilterMaxOutputSize(param->maxInputSegment, filterOrder));
+  self->bufferSize = param->maxWindowSize + std::max(param->hopSize, rvRTFilterMaxOutputSize(param->hopSize, filterOrder));
   self->buffer = RVALLOC(RvReal, self->bufferSize);
   std::fill(self->buffer, self->buffer + self->param.maxWindowSize / 2, 0.0);
   std::fill(self->buffer + self->param.maxWindowSize / 2, self->buffer + self->bufferSize, 0.0);
@@ -114,7 +112,7 @@ void rvRTPYinDumpBuffer(RvRTPYinProcessor *self, RvReal *out)
 int rvCallRTPYin(RvRTPYinProcessor *self, const RvReal *x, int nX, RvReal *out, int maxOut)
 {
   rvAssert(x || nX == 0, "x cannot be nullptr with non-zero nX");
-  rvAssert(nX >= 0 && nX <= self->param.maxInputSegment, "invalid nX");
+  rvAssert(nX >= 0 && nX <= self->param.hopSize, "invalid nX");
   rvAssert(maxOut > 0 && maxOut <= 128, "maxOut must be in range (0, 128]");
   rvAssert(out, "out cannot be nullptr");
   int halfMaxWindowSize = self->param.maxWindowSize / 2;

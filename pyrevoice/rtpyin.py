@@ -31,7 +31,7 @@ class Processor:
             filterOrder = int(2048 * sr / 44100.0)
             if(filterOrder % 2 == 0):
                 filterOrder += 1
-            kernel = sp.firwin(filterOrder, max(1500.0, self.maxFreq * 4.0), window = "blackman", nyq = sr / 2.0)
+            kernel = sp.firwin(filterOrder, max(self.maxFreq + 500.0, self.maxFreq * 3.0), window = "blackman", nyq = sr / 2.0)
             self.prefilterProc = rtfilter.Procressor(kernel)
             self.delay += filterOrder
         self.buffer = np.zeros(halfWindowSize, dtype = np.float64)

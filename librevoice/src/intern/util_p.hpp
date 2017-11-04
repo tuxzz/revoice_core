@@ -171,10 +171,8 @@ namespace ReVoice
     return static_cast<int>(std::min_element(array, array + n) - array);
   }
 
-  template<typename T>static inline T sum(const T *array, int n, T init = 0)
-  {
-    return std::accumulate(array, array + n, init);
-  }
+  template<typename T>static inline T sum(const T *A, int n, T init = 0)
+  { return std::accumulate(A, A + n, init); }
 
   template<typename T>static inline T squareSum(const T *array, int n, T init = 0)
   {
@@ -184,7 +182,7 @@ namespace ReVoice
   }
 
   template<typename T>static inline T mean(const T *array, int n, T init = 0)
-  { return std::accumulate(array, array + n, init) / static_cast<T>(n); }
+  { return sum(array, n, init) / static_cast<T>(n); }
 
   template<typename T>static inline T *getitem(const T *array, int *idx, int nIdx, T *out = nullptr)
   {

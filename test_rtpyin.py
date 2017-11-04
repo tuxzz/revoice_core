@@ -118,6 +118,16 @@ if((np.abs(f0List - f0List_o) > 1e-5).any()):
 if((np.abs(f0List_pf - f0List_pf_o) > 1e-5).any()):
     print("Test failed with prefilter, max diff = %lf" % np.max(np.abs(f0List_pf - f0List_pf_o)))
 
+for i, obsProb in enumerate(obsProbList):
+    if(obsProbList_o[i].shape != obsProb.shape or (np.abs(obsProbList_o[i] - obsProb) > 1e-5).any()):
+        print("Test failed without prefilter @ obsProb", i)
+        print("  Diff:", obsProb - obsProbList_o[i])
+
+for i, obsProb in enumerate(obsProbList_pf):
+    if(obsProbList_pf_o[i].shape != obsProb.shape or (np.abs(obsProbList_pf_o[i] - obsProb) > 1e-5).any()):
+        print("Test failed with prefilter @ obsProb", i)
+        print("  Diff:", obsProb - obsProbList_pf_o[i])
+
 gc.collect()
 rvExitCheck()
 

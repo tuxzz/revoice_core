@@ -19,7 +19,6 @@ class RvRTPYinProcessorParameter(ctypes.Structure):
         ("bias", RvReal),
         ("hopSize", ctypes.c_int), ("maxWindowSize", ctypes.c_int),
         ("maxIter", ctypes.c_int), ("pdfSize", ctypes.c_int),
-        ("maxInputSegment", ctypes.c_int),
         ("prefilter", ctypes.c_bool), ("isPdfDefault", ctypes.c_bool),
     ]
 
@@ -88,7 +87,6 @@ class Processor:
 
         self.pdf = kwargs.get("pdf", None)
 
-        self.maxInputSegment = kwargs.get("maxInputSegment", self.hopSize)
         self.maxWindowSize = max(roundUpToPowerOf2(self.samprate / self.minFreq * 4), self.hopSize)
         if(self.pdf is None):
             v = rvCreateRTPYinProcessorParameter.argtypes
@@ -105,7 +103,6 @@ class Processor:
         param.contents.probThreshold = self.probThreshold
         param.contents.weightPrior = self.weightPrior
         param.contents.bias = self.bias
-        param.contents.maxInputSegment = self.maxInputSegment
         param.contents.maxWindowSize = self.maxWindowSize
         self.proc = rvCreateRTPYinProcessor(param)
         rvDestroyRTPYinProcessorParameter(param)

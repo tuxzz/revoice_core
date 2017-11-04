@@ -17,7 +17,6 @@ typedef struct RvRTPYinProcessorParameter
   RvReal bias;
   int hopSize, maxWindowSize;
   int maxIter, pdfSize;
-  int maxInputSegment;
   bool prefilter, isPdfDefault;
 } RvRTPYinProcessorParameter;
 

@@ -34,14 +34,12 @@ bool rvRTSparseHMMFeed(RvRTSparseHMM *self, RvReal *obs)
   int nState = self->sparseHMM.nState;
   if(self->psiUsed == 0)
   {
-    RvReal deltaSum = 0.0;
     for(int i = 0; i < nState; ++i)
     {
       RvReal v = self->sparseHMM.init[i] * obs[i];
       self->oldDelta[i] = v;
-      deltaSum += v;
     }
-
+    RvReal deltaSum = sum(self->oldDelta, nState);
     if(deltaSum > 0.0)
     {
       for(int i = 0; i < nState; ++i)

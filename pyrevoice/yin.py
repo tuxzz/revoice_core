@@ -69,7 +69,7 @@ def doPrefilter(x, maxFreq, sr):
     filterOrder = int(2048 * sr / 44100.0)
     if(filterOrder % 2 == 0):
         filterOrder += 1
-    f = sp.firwin(filterOrder, max(1500.0, maxFreq * 4.0), window = "blackman", nyq = sr / 2.0)
+    f = sp.firwin(filterOrder, max(maxFreq + 500.0, maxFreq * 3.0), window = "blackman", nyq = sr / 2.0)
     halfFilterOrder = filterOrder // 2
     x = sp.fftconvolve(x, f)[halfFilterOrder:-halfFilterOrder]
     return x
